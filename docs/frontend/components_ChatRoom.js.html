@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/ChatRoom.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/ChatRoom.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useState, useEffect } from "react";
+import socketIOClient from "socket.io-client";
+import {
+  Box,
+  Input,
+  Button,
+  Text,
+  VStack,
+  HStack,
+  useToast,
+  List,
+  ListItem,
+  FormControl,
+  FormLabel,
+  Select,
+} from "@chakra-ui/react";
+import { useColorModeValue } from "@chakra-ui/react";
+
+const ENDPOINT = "http://127.0.0.1:4000";
+const socket = socketIOClient(ENDPOINT);
+
+/**
+ * ChatRoom component where users can join chat rooms, send and receive messages, and see active users.
+ */
+function ChatRoom() {
+  const [username, setUsername] = useState("");
+  const [room, setRoom] = useState("");
+  const [message, setMessage] = useState("");
+  const [privateMsg, setPrivateMsg] = useState("");
+  const [receiverId, setReceiverId] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [activeUsers, setActiveUsers] = useState([]);
+  const toast = useToast();
+
+  /**
+   * Joins a chat room by emitting a joinRoom event to the server.
+   */
+  const joinRoom = () => {
+    if (username &amp;&amp; room) {
+      socket.emit("joinRoom", { username, room });
+    }
+  };
+
+  /**
+   * Sends a public chat message to the current room.
+   */
+  const sendMessage = () => {
+    if (message) {
+      socket.emit("chatMessage", { room, message });
+      setMessage("");
+    }
+  };
+
+  /**
+   * Sends a private message to a selected user.
+   */
+  const sendPrivateMessage = () => {
+    if (privateMsg &amp;&amp; receiverId) {
+      socket.emit("privateMessage", { receiverId, message: privateMsg });
+      setPrivateMsg("");
+    }
+  };
+
+  /**
+   * useEffect hook to set up Socket.IO event listeners for messages,
+   * private messages, room data updates, and notifications.
+   * Cleans up listeners on component unmount.
+   */
+  useEffect(() => {
+    socket.on("message", (message) => {
+      setMessages((msgs) => [...msgs, message]);
+    });
+
+    socket.on("privateMessage", (msg) => {
+      toast({
+        title: `Private message from ${msg.from}`,
+        description: msg.message,
+        status: "info",
+        duration: 5000,
+        isClosable: true,
+      });
+    });
+
+    socket.on("roomData", ({ users }) => {
+      setActiveUsers(users);
+    });
+
+    socket.on("notification", (notification) => {
+      toast({
+        title: notification,
+        status: "info",
+        duration: 5000,
+        isClosable: true,
+        position: "top-right",
+      });
+    });
+
+    return () => {
+      socket.off("message");
+      socket.off("privateMessage");
+      socket.off("roomData");
+      socket.off("notification");
+    };
+  }, [toast]);
+
+  const borderColor = useColorModeValue("brand.200", "brand.300");
+
+  return (
+    &lt;VStack spacing={4}>
+      &lt;Text fontSize="2xl" color="brand.400">
+        Chat Room: {room}
+      &lt;/Text>
+      &lt;HStack>
+        &lt;Input
+          placeholder="Name"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          borderColor={borderColor}
+        />
+        &lt;Input
+          placeholder="Room"
+          value={room}
+          onChange={(e) => setRoom(e.target.value)}
+          borderColor={borderColor}
+        />
+        &lt;Button colorScheme="blue" onClick={joinRoom} isFullWidth={true}>
+          Join Room
+        &lt;/Button>
+      &lt;/HStack>
+      &lt;Box
+        w="100%"
+        p={4}
+        borderWidth="1px"
+        borderRadius="lg"
+        borderColor={borderColor}
+      >
+        {messages.map((msg, index) => (
+          &lt;Text key={index} color="brand.300">
+            {msg.user}: {msg.text}
+          &lt;/Text>
+        ))}
+      &lt;/Box>
+      &lt;HStack>
+        &lt;Input
+          placeholder="Message"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          borderColor={borderColor}
+        />
+        &lt;Button colorScheme="teal" onClick={sendMessage}>
+          Send
+        &lt;/Button>
+      &lt;/HStack>
+      &lt;HStack>
+        &lt;FormControl>
+          &lt;FormLabel htmlFor="receiver-select">
+            Send Private Message To:
+          &lt;/FormLabel>
+          &lt;Select
+            id="receiver-select"
+            onChange={(e) => setReceiverId(e.target.value)}
+          >
+            {activeUsers.map((user, index) => (
+              &lt;option key={index} value={user.id}>
+                {user.username}
+              &lt;/option>
+            ))}
+          &lt;/Select>
+        &lt;/FormControl>
+        &lt;Input
+          placeholder="Private Message"
+          value={privateMsg}
+          onChange={(e) => setPrivateMsg(e.target.value)}
+          borderColor={borderColor}
+        />
+        &lt;Button colorScheme="purple" onClick={sendPrivateMessage}>
+          Send PM
+        &lt;/Button>
+      &lt;/HStack>
+      &lt;Box w="100%" p={4}>
+        &lt;Text fontSize="md" color="brand.400">
+          Active Users:
+        &lt;/Text>
+        &lt;List spacing={2}>
+          {activeUsers.map((user, index) => (
+            &lt;ListItem key={index} color="brand.300">
+              {user.username}
+            &lt;/ListItem>
+          ))}
+        &lt;/List>
+      &lt;/Box>
+    &lt;/VStack>
+  );
+}
+
+export default ChatRoom;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#App">App</a></li><li><a href="global.html#ChatRoom">ChatRoom</a></li><li><a href="global.html#root">root</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri Jan 26 2024 10:12:51 GMT-0500 (Eastern Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
