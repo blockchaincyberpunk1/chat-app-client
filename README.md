@@ -1,12 +1,12 @@
 # Chat App Frontend
 
-This is the frontend for the Chat App, a real-time messaging platform built with React and Chakra UI.
+This is the frontend for the Chat App, a real-time messaging platform built with React and Chakra UI. 
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![GitHub Stars](https://img.shields.io/github/stars/yourusername/chat-app)](https://github.com/yourusername/chat-app/stargazers)
-[![GitHub Forks](https://img.shields.io/github/forks/yourusername/chat-app)](https://github.com/yourusername/chat-app/network/members)
-[![GitHub Issues](https://img.shields.io/github/issues/yourusername/chat-app)](https://github.com/yourusername/chat-app/issues)
-[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/yourusername/chat-app)](https://github.com/yourusername/chat-app/pulls)
+[![GitHub Stars](https://img.shields.io/github/stars/blockchaincyberpunk1/chat-app-client)](https://github.com/blockchaincyberpunk1/chat-app-client/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/blockchaincyberpunk1/chat-app-client)](https://github.com/blockchaincyberpunk1/chat-app-client/network/members)
+[![GitHub Issues](https://img.shields.io/github/issues/blockchaincyberpunk1/chat-app-client)](https://github.com/blockchaincyberpunk1/chat-app-client/issues)
+[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/blockchaincyberpunk1/chat-app-client)](https://github.com/blockchaincyberpunk1/chat-app-client/pulls)
 
 ## Table of Contents
 
@@ -46,7 +46,7 @@ To set up the frontend on your local machine:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/chat-app.git
+   git clone https://github.com/blockchaincyberpunk1/chat-app-client.git
    ```
 
 2. Navigate to the project directory:

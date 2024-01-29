@@ -16,7 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@chakra-ui/react";
 
-const ENDPOINT = "http://127.0.0.1:4000";
+const ENDPOINT = "https://boiling-sands-05775-faf135588ab1.herokuapp.com/";
 const socket = socketIOClient(ENDPOINT);
 
 /**
